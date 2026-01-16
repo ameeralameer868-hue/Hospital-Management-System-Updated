@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK with Firebase
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout the repository
+      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -32,19 +32,24 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 5️⃣ Clean project (avoid build cache issues)
+      # 5️⃣ Add google-services.json from secret
+      - name: Add google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+
+      # 6️⃣ Clean project
       - name: Clean project
         run: ./gradlew clean
 
-      # 6️⃣ Build APK Debug
+      # 7️⃣ Build APK Debug
       - name: Build APK
         run: ./gradlew assembleDebug --stacktrace
 
-      # 7️⃣ Verify APK exists
+      # 8️⃣ Verify APK exists
       - name: List APK files
         run: find . -name "*.apk"
 
-      # 8️⃣ Upload APK as artifact
+      # 9️⃣ Upload APK as artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
